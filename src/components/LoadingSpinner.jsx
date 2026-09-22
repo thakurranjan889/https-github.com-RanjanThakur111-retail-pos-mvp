@@ -3,8 +3,8 @@ import '../styles/LoadingSpinner.css';
 
 const LoadingSpinner = () => {
   return (
-    <div className="loading-container">
-      <div className="spinner"></div>
+    <div className="loading-container" aria-live="polite">
+      <div className="spinner" aria-label="Loading" />
       <p>Loading...</p>
     </div>
   );
