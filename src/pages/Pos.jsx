@@ -23,7 +23,7 @@ export default function Pos({ user }) {
         qty: 1,
       })),
       total: cart.reduce((sum, item) => sum + (Number(item.price) || 0), 0),
-      status: 'completed',
+      status: 'pending',
     };
 
     await addDoc(collection(db, 'sales'), sale);

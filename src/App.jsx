@@ -150,7 +150,7 @@ export default function App() {
                           : '—'}
                       </td>
                       <td>{Number(sale.total || 0).toFixed(2)}</td>
-                      <td>{sale.status || 'completed'}</td>
+                      <td>{sale.status || 'pending'}</td>
                     </tr>
                   ))}
                 </tbody>
