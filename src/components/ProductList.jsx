@@ -59,6 +59,15 @@ export default function ProductList({ isAdmin }) {
       return;
     }
 
+    const duplicateSku = products.some(
+      (product) => String(product.sku || '').trim().toLowerCase() === sku.toLowerCase()
+    );
+
+    if (duplicateSku) {
+      setError('SKU already exists. Please use a unique SKU for each product.');
+      return;
+    }
+
     setSaving(true);
     setError('');
     try {
