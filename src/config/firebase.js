@@ -1,2 +1,15 @@
-export { auth, googleProvider, db, firebaseApp, app } from '../firebaseConfig';
+import {
+  auth,
+  googleProvider,
+  db,
+  firebaseApp,
+} from '../firebaseConfig';
+
+export {
+  auth,
+  googleProvider,
+  db,
+  firebaseApp,
+};
+
 export default firebaseApp;
