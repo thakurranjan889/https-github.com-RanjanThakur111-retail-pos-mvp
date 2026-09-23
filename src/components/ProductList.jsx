@@ -53,6 +53,7 @@ export default function ProductList({ isAdmin }) {
     const name = form.name.trim();
     const price = Number(form.price);
     const qty = Number(form.qty_on_hand);
+    const barcode = form.barcode.trim();
 
     if (!sku || !name || !Number.isFinite(price) || price < 0 || !Number.isInteger(qty) || qty < 0) {
       setError('Please enter a valid SKU, name, price, and whole-number quantity.');
@@ -68,12 +69,23 @@ export default function ProductList({ isAdmin }) {
       return;
     }
 
+    if (barcode) {
+      const duplicateBarcode = products.some(
+        (product) => String(product.barcode || '').trim().toLowerCase() === barcode.toLowerCase()
+      );
+
+      if (duplicateBarcode) {
+        setError('Barcode already exists. Please use a unique barcode for each product.');
+        return;
+      }
+    }
+
     setSaving(true);
     setError('');
     try {
       await addDoc(collection(db, 'products'), {
         sku,
-        barcode: form.barcode.trim() || null,
+        barcode: barcode || null,
         name,
         price,
         qty_on_hand: qty,
