@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from './firebaseConfig';
 import ProductList from './components/ProductList';
 import Pos from './pages/Pos';
@@ -13,6 +13,7 @@ export default function App() {
   const [view, setView] = useState('pos');
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -53,6 +54,24 @@ export default function App() {
       ignore = true;
     };
   }, [isAdmin, view]);
+
+  async function updateOrderStatus(orderId, status) {
+    if (!isAdmin) return;
+
+    setUpdatingOrderId(orderId);
+    setError('');
+
+    try {
+      await updateDoc(doc(db, 'sales', orderId), { status });
+      setOrders((currentOrders) => currentOrders.map((order) => (
+        order.id === orderId ? { ...order, status } : order
+      )));
+    } catch (err) {
+      setError(err.message || 'Could not update order status.');
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  }
 
   const handleGoogleLogin = async () => {
     try {
@@ -165,34 +184,64 @@ export default function App() {
             ) : orders.length === 0 ? (
               <p className="empty-state inline-empty">No customer orders yet.</p>
             ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Customer</th>
-                    <th>Delivery Address</th>
-                    <th>Time</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((sale) => (
-                    <tr key={sale.id}>
-                      <td>{sale.customerEmail || sale.customerUid || 'Unknown customer'}</td>
-                      <td>{sale.delivery_address || 'Pickup'}</td>
-                      <td>{sale.created_at?.toDate ? sale.created_at.toDate().toLocaleString() : '—'}</td>
-                      <td>
-                        {Array.isArray(sale.items)
-                          ? sale.items.map((item) => item.name || item.sku || 'Item').join(', ')
-                          : '—'}
-                      </td>
-                      <td>{Number(sale.total || 0).toFixed(2)}</td>
-                      <td><span className="status-pill">{sale.status || 'pending'}</span></td>
+              <div className="table-wrap">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Delivery Address</th>
+                      <th>Time</th>
+                      <th>Items</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {orders.map((sale) => {
+                      const status = sale.status || 'pending';
+                      const isUpdating = updatingOrderId === sale.id;
+
+                      return (
+                        <tr key={sale.id}>
+                          <td>{sale.customerEmail || sale.customerUid || 'Unknown customer'}</td>
+                          <td>{sale.delivery_address || 'Pickup'}</td>
+                          <td>{sale.created_at?.toDate ? sale.created_at.toDate().toLocaleString() : '—'}</td>
+                          <td>
+                            {Array.isArray(sale.items)
+                              ? sale.items.map((item) => item.name || item.sku || 'Item').join(', ')
+                              : '—'}
+                          </td>
+                          <td>{Number(sale.total || 0).toFixed(2)}</td>
+                          <td><span className="status-pill">{status}</span></td>
+                          <td>
+                            {status === 'pending' ? (
+                              <div className="order-actions">
+                                <button
+                                  className="order-action complete"
+                                  onClick={() => updateOrderStatus(sale.id, 'completed')}
+                                  disabled={isUpdating}
+                                >
+                                  {isUpdating ? 'Updating...' : 'Complete'}
+                                </button>
+                                <button
+                                  className="order-action unsuccessful"
+                                  onClick={() => updateOrderStatus(sale.id, 'unsuccessful')}
+                                  disabled={isUpdating}
+                                >
+                                  Unsuccessful
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="order-closed">Closed</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
         ) : (
