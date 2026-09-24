@@ -72,7 +72,7 @@ export default function App() {
     return (
       <div className="app-shell loading-shell">
         <div className="spinner" />
-        <p>Loading...</p>
+        <p>Loading your workspace...</p>
       </div>
     );
   }
@@ -80,22 +80,36 @@ export default function App() {
   if (!user) {
     return (
       <div className="login-screen">
+        <div className="login-glow login-glow-one" />
+        <div className="login-glow login-glow-two" />
         <div className="login-panel">
+          <div className="brand-mark">R</div>
+          <p className="eyebrow">Retail Operations</p>
           <h1>Retail POS MVP</h1>
-          <p>Sign in with Google to continue</p>
+          <p className="login-subtext">Track inventory, manage sales, and keep your store running smoothly.</p>
           {error && <div className="alert error">{error}</div>}
           <button className="google-btn" onClick={handleGoogleLogin}>Sign in with Google</button>
+          <div className="login-meta">
+            <span>Admin access</span>
+            <strong>ranjan111790@gmail.com</strong>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="app">
+    <div className="app-shell dashboard-shell">
       <header className="topbar">
-        <h1>Retail POS MVP</h1>
+        <div className="brand-block">
+          <div className="brand-mark brand-mark-small">R</div>
+          <div>
+            <div className="brand-label">Retail POS</div>
+            <h1>Operations Center</h1>
+          </div>
+        </div>
 
-        <nav className="nav-tabs">
+        <nav className="nav-tabs" aria-label="Main navigation">
           <button className={view === 'pos' ? 'active' : ''} onClick={() => setView('pos')}>
             POS
           </button>
@@ -110,26 +124,48 @@ export default function App() {
         </nav>
 
         <div className="user-box">
-          <span>
-            {user.email} {isAdmin ? '(Admin — client-side only)' : ''}
-          </span>
+          <div className="user-meta">
+            <span className="user-role">{isAdmin ? 'Admin' : 'Staff'}</span>
+            <span>{user.email}</span>
+          </div>
           <button className="signout-btn" onClick={handleSignOut}>Sign out</button>
         </div>
       </header>
 
-      <main>
+      <main className="content-shell">
+        <div className="stat-grid">
+          <div className="stat-card">
+            <span className="stat-label">Sales</span>
+            <strong>{view === 'orders' ? 'Live' : 'Ready'}</strong>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Inventory</span>
+            <strong>{view === 'products' ? 'Managed' : 'Synced'}</strong>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Access</span>
+            <strong>{isAdmin ? 'Admin' : 'View Only'}</strong>
+          </div>
+        </div>
+
         {view === 'products' ? (
           <ProductList isAdmin={isAdmin} />
         ) : view === 'orders' && isAdmin ? (
-          <section className="orders-section">
-            <h2>Orders</h2>
+          <section className="panel-card orders-section">
+            <div className="section-header">
+              <div>
+                <p className="eyebrow">Analytics</p>
+                <h2>Recent Orders</h2>
+              </div>
+              <span className="status-badge">{orders.length} total</span>
+            </div>
             {error && <div className="alert error">{error}</div>}
             {ordersLoading ? (
-              <p>Loading orders...</p>
+              <p className="empty-state inline-empty">Loading orders...</p>
             ) : orders.length === 0 ? (
-              <p>No customer orders yet.</p>
+              <p className="empty-state inline-empty">No customer orders yet.</p>
             ) : (
-              <table className="orders-table">
+              <table className="data-table">
                 <thead>
                   <tr>
                     <th>Customer</th>
@@ -150,7 +186,7 @@ export default function App() {
                           : '—'}
                       </td>
                       <td>{Number(sale.total || 0).toFixed(2)}</td>
-                      <td>{sale.status || 'pending'}</td>
+                      <td><span className="status-pill">{sale.status || 'pending'}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -164,3 +200,4 @@ export default function App() {
     </div>
   );
 }
+

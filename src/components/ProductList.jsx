@@ -22,8 +22,6 @@ export default function ProductList({ isAdmin }) {
     setError('');
 
     try {
-      // Do not use orderBy here: products imported from CSV and products
-      // created in the UI may not all have the same optional fields.
       const snapshot = await getDocs(collection(db, 'products'));
       const rows = snapshot.docs
         .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
@@ -100,8 +98,15 @@ export default function ProductList({ isAdmin }) {
   }
 
   return (
-    <section>
-      <h2>Products</h2>
+    <section className="panel-card product-section">
+      <div className="section-header">
+        <div>
+          <p className="eyebrow">Catalog</p>
+          <h2>Product Inventory</h2>
+        </div>
+        <span className="status-badge">{products.length} items</span>
+      </div>
+
       {error && <div className="alert error">{error}</div>}
 
       {isAdmin && (
@@ -116,28 +121,31 @@ export default function ProductList({ isAdmin }) {
       )}
 
       {loading ? (
-        <p>Loading products...</p>
+        <p className="empty-state inline-empty">Loading products...</p>
       ) : products.length === 0 ? (
         <div className="empty-state">
           No products available yet. {isAdmin ? 'Add a product above or import data/products.csv.' : 'Ask the admin to import or add products.'}
         </div>
       ) : (
-        <table className="products">
-          <thead>
-            <tr><th>SKU</th><th>Name</th><th>Price</th><th>Qty</th></tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.sku || product.id}</td>
-                <td>{product.name || 'Unnamed product'}</td>
-                <td>{Number(product.price || 0).toFixed(2)}</td>
-                <td>{product.qty_on_hand ?? 0}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr><th>SKU</th><th>Name</th><th>Price</th><th>Qty</th></tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id}>
+                  <td>{product.sku || product.id}</td>
+                  <td>{product.name || 'Unnamed product'}</td>
+                  <td>{Number(product.price || 0).toFixed(2)}</td>
+                  <td>{product.qty_on_hand ?? 0}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   );
 }
+
