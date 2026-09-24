@@ -169,6 +169,7 @@ export default function App() {
                 <thead>
                   <tr>
                     <th>Customer</th>
+                    <th>Delivery Address</th>
                     <th>Time</th>
                     <th>Items</th>
                     <th>Total</th>
@@ -179,6 +180,7 @@ export default function App() {
                   {orders.map((sale) => (
                     <tr key={sale.id}>
                       <td>{sale.customerEmail || sale.customerUid || 'Unknown customer'}</td>
+                      <td>{sale.delivery_address || 'Pickup'}</td>
                       <td>{sale.created_at?.toDate ? sale.created_at.toDate().toLocaleString() : '—'}</td>
                       <td>
                         {Array.isArray(sale.items)

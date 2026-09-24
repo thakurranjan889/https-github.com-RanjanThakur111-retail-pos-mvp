@@ -5,17 +5,31 @@ import { db } from '../firebaseConfig';
 export default function Pos({ user }) {
   const [cart, setCart] = useState([]);
   const [barcode, setBarcode] = useState('');
+  const [deliveryMode, setDeliveryMode] = useState('pickup');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
 
   function addItem(item) {
     setCart((current) => [...current, item]);
   }
 
   async function createSale() {
+    if (cart.length === 0) {
+      alert('Please add at least one product before completing the sale.');
+      return;
+    }
+
+    if (deliveryMode === 'delivery' && !deliveryAddress.trim()) {
+      alert('Please enter the delivery address before saving this order.');
+      return;
+    }
+
     const sale = {
       created_at: serverTimestamp(),
       customerUid: user?.uid || null,
       customerEmail: user?.email || null,
       customerDisplayName: user?.displayName || null,
+      delivery_mode: deliveryMode,
+      delivery_address: deliveryMode === 'delivery' ? deliveryAddress.trim() : null,
       items: cart.map((item) => ({
         sku: item.sku,
         name: item.name,
@@ -23,12 +37,14 @@ export default function Pos({ user }) {
         qty: 1,
       })),
       total: cart.reduce((sum, item) => sum + (Number(item.price) || 0), 0),
-      status: 'pending',
+      status: deliveryMode === 'delivery' ? 'delivery' : 'pickup',
     };
 
     await addDoc(collection(db, 'sales'), sale);
     setCart([]);
-    alert('Sale recorded');
+    setDeliveryMode('pickup');
+    setDeliveryAddress('');
+    alert(deliveryMode === 'delivery' ? 'Delivery order recorded' : 'Sale recorded');
   }
 
   async function handleBarcodeAdd() {
@@ -67,6 +83,43 @@ export default function Pos({ user }) {
         />
         <button className="primary-btn" onClick={handleBarcodeAdd}>Add item</button>
       </div>
+
+      <div className="delivery-mode-row">
+        <label className="mode-option">
+          <input
+            type="radio"
+            name="deliveryMode"
+            value="pickup"
+            checked={deliveryMode === 'pickup'}
+            onChange={(event) => setDeliveryMode(event.target.value)}
+          />
+          Pickup
+        </label>
+        <label className="mode-option">
+          <input
+            type="radio"
+            name="deliveryMode"
+            value="delivery"
+            checked={deliveryMode === 'delivery'}
+            onChange={(event) => setDeliveryMode(event.target.value)}
+          />
+          Delivery
+        </label>
+      </div>
+
+      {deliveryMode === 'delivery' && (
+        <div className="delivery-address-box">
+          <label htmlFor="delivery-address">Delivery address</label>
+          <textarea
+            id="delivery-address"
+            className="delivery-address-input"
+            rows="3"
+            value={deliveryAddress}
+            onChange={(event) => setDeliveryAddress(event.target.value)}
+            placeholder="House number, street, area, city, state, ZIP code"
+          />
+        </div>
+      )}
 
       <div className="cart-layout">
         <div className="cart-list-wrap">
