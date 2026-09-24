@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "import:products": "node scripts/import_products.js"
+    "import:products": "node scripts/import_products.js",
+    "firebase:deploy": "firebase deploy --only hosting,functions"
   },
   "dependencies": {
     "react": "^18.2.0",
