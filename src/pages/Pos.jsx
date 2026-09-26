@@ -125,7 +125,7 @@ export default function Pos({ user }) {
         <div className="cart-list-wrap">
           <h3>Current Cart</h3>
           {cart.length === 0 ? (
-            <div className="empty-state small-empty">No items yet. Scan a barcode to begin.</div>
+            <div className="empty-state small-empty">No items yet.</div>
           ) : (
             <ul className="cart-list">
               {cart.map((item, index) => (
