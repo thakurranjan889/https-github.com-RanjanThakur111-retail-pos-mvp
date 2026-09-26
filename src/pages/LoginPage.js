@@ -88,7 +88,7 @@ const LoginPage = () => {
               🔒 Your login is secure and encrypted
             </p>
             <p className="admin-notice">
-              Admin access: ranjan111790@gmail.com
+              For any issuse contact: ranjan111790@gmail.com
             </p>
           </div>
         </div>
