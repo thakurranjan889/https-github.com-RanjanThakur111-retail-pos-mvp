@@ -37,7 +37,7 @@ export default function Pos({ user }) {
         qty: 1,
       })),
       total: cart.reduce((sum, item) => sum + (Number(item.price) || 0), 0),
-      status: deliveryMode === 'delivery' ? 'delivery' : 'pickup',
+      status: 'pending',
     };
 
     await addDoc(collection(db, 'sales'), sale);
@@ -159,4 +159,3 @@ export default function Pos({ user }) {
     </section>
   );
 }
-
