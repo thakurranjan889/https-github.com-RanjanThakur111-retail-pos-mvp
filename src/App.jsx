@@ -109,7 +109,7 @@ export default function App() {
           {error && <div className="alert error">{error}</div>}
           <button className="google-btn" onClick={handleGoogleLogin}>Sign in with Google</button>
           <div className="login-meta">
-            <span>Admin access</span>
+            <span>For any error contact</span>
             <strong>ranjan111790@gmail.com</strong>
           </div>
         </div>
