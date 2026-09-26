@@ -144,7 +144,7 @@ export default function App() {
 
         <div className="user-box">
           <div className="user-meta">
-            <span className="user-role">{isAdmin ? 'Admin' : 'Staff'}</span>
+            <span className="user-role">{isAdmin ? 'Admin' : 'Customer'}</span>
             <span>{user.email}</span>
           </div>
           <button className="signout-btn" onClick={handleSignOut}>Sign out</button>
@@ -212,7 +212,7 @@ export default function App() {
                               ? sale.items.map((item) => item.name || item.sku || 'Item').join(', ')
                               : '—'}
                           </td>
-                          <td>{Number(sale.total || 0).toFixed(2)}</td>
+                          <td>${Number(sale.total || 0).toFixed(2)}</td>
                           <td><span className="status-pill">{status}</span></td>
                           <td>
                             {status === 'pending' ? (
@@ -251,4 +251,3 @@ export default function App() {
     </div>
   );
 }
-
